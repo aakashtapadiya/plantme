@@ -1,4 +1,4 @@
 package com.ecommerce.plantme.repository;
 
-public class UserRepo {
+public class UserDAO {
 }
