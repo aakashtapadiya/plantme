@@ -1,7 +1,6 @@
 package com.ecommerce.plantme.payloads;
 
 import com.ecommerce.plantme.entity.enums.UserStatus;
-import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -19,7 +19,7 @@ public class UserController {
     }
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<UserDTO> registerHandler (@PathVariable Long userId) {
+    public ResponseEntity<UserDTO> getUser (@PathVariable Long userId) {
         UserDTO userDTO = userService.getUserbyId(userId);
         return new ResponseEntity<UserDTO>(userDTO, HttpStatus.CREATED);
     }
