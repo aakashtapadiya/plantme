@@ -1,6 +1,6 @@
 package com.ecommerce.plantme.payloads;
 
-import jakarta.persistence.Entity;
+import com.ecommerce.plantme.entity.enums.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,5 +16,6 @@ public class UserDTO {
     private String email;
     private String mobileNumber;
     private String password;
+    private UserStatus userStatus;
 
 }

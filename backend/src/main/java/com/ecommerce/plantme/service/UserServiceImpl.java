@@ -5,12 +5,12 @@ import com.ecommerce.plantme.exceptions.CommonApiException;
 import com.ecommerce.plantme.exceptions.ResourceNotFoundException;
 import com.ecommerce.plantme.payloads.UserDTO;
 import com.ecommerce.plantme.repository.UserRepo;
-import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -20,11 +20,13 @@ public class UserServiceImpl implements UserService {
     private ModelMapper modelMapper;
 
     @Autowired
-    public UserServiceImpl (UserRepo userRepo, ModelMapper modelMapper) {
+    public UserServiceImpl (
+            UserRepo userRepo,
+            ModelMapper modelMapper
+    ) {
         this.userRepo = userRepo;
         this.modelMapper = modelMapper;
     }
-
 
     /**
      * Register new User
@@ -32,26 +34,20 @@ public class UserServiceImpl implements UserService {
      * @param userDTO
      * @return UserDTO
      */
+    @Transactional
     @Override
-    public UserDTO registerUser(UserDTO userDTO) {
+    public UserDTO registerUser (UserDTO userDTO)  {
 
-        try {
-            User user = this.dtoToUser(userDTO);
-            User savedUser = userRepo.save(user);
-            return this.userToDto(savedUser);
-
-        } catch (DataIntegrityViolationException e) {
-            if (userRepo.findByEmail(userDTO.getEmail()) != null) {
-                throw new CommonApiException("Email Id Already exists : " + userDTO.getEmail());
-            }
-            if (userRepo.findByMobileNumber(userDTO.getMobileNumber()) != null) {
-                throw new CommonApiException("Mobile Number Already exists : " + userDTO.getMobileNumber());
-            }
-            throw new CommonApiException(e.getMessage());
+        if (userRepo.findByEmail(userDTO.getEmail()) != null) {
+            throw new CommonApiException("Email Id Already exists : " + userDTO.getEmail());
         }
-
+        if (userRepo.findByMobileNumber(userDTO.getMobileNumber()) != null) {
+            throw new CommonApiException("Mobile Number Already exists : " + userDTO.getMobileNumber());
+        }
+        User user = this.dtoToUser(userDTO);
+        User savedUser = userRepo.save(user);
+        return this.userToDto(savedUser);
     }
-
 
     /**
      * Get User using Primary key User Id
@@ -59,15 +55,12 @@ public class UserServiceImpl implements UserService {
      * @param userId
      * @return userDTO
      */
+
     @Override
     public UserDTO getUserbyId(Long userId) {
-        Optional<User> user = userRepo.findById(userId);
-        if (user.isEmpty() || userId<0) {
-            throw new ResourceNotFoundException("User", "userId", userId);
-        }
-        return this.userToDto(user.get());
+        User user = userRepo.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User", "userId", userId));
+        return this.userToDto(user);
     }
-
 
     /**
      * MAPPING UserDTO to User
@@ -80,7 +73,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * MAPPING UserDTO TO User
+     * MAPPING user TO UserDTO
      * @param user
      * @return userDTO
      */

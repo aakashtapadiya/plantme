@@ -4,6 +4,8 @@ import com.ecommerce.plantme.entity.enums.UserStatus;
 import jakarta.validation.constraints.Email;
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -17,10 +19,10 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
     @Column(name = "email", unique = true, nullable = false)
@@ -30,11 +32,15 @@ public class User {
     @Column(name = "mobile_number", unique = true, nullable = false)
     private String mobileNumber;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "user_status", nullable = false)
+    @Column(name = "user_status")
     private UserStatus userStatus = UserStatus.INACTIVE;
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "User_Address", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "address_id"))
+    private List<Address> addresses = new ArrayList<>();
 
 }
