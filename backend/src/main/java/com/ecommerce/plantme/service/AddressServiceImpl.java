@@ -36,10 +36,11 @@ public class AddressServiceImpl implements AddressService {
     }
 
     /**
-     * Create new Address if the Address is not Created Earlier
+     * Create or Update an Address for Particular User
      *
+     * @param userId
      * @param addressDTO
-     * @return addressDTO
+     * @return AddressDTO
      */
     @Transactional
     @Override
@@ -80,8 +81,9 @@ public class AddressServiceImpl implements AddressService {
 
     /**
      * GET All Addresses for a User
+     *
      * @param userId
-     * @return
+     * @return List<AddressDTO>
      */
     @Override
     public List<AddressDTO> getAllAddressesForUser (Long userId) {
@@ -102,8 +104,9 @@ public class AddressServiceImpl implements AddressService {
     /**
      * Delete Address for a User by UserId
      *
+     * @param addressId
      * @param userId
-     * @return
+     * @return String
      */
     @Transactional
     @Override
