@@ -28,4 +28,14 @@ public class GlobalExceptionHandler {
         commonApiExceptionResponse.setTimeStamp(System.currentTimeMillis());
         return new ResponseEntity<CommonApiExceptionResponse>(commonApiExceptionResponse, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(ResourceAlreadyFoundException.class)
+    public ResponseEntity<CommonApiExceptionResponse> myResourceAlreadyFoundException (ResourceAlreadyFoundException e) {
+        String message = e.getMessage();
+        CommonApiExceptionResponse commonApiExceptionResponse = new CommonApiExceptionResponse();
+        commonApiExceptionResponse.setStatus(HttpStatus.NOT_FOUND.value());
+        commonApiExceptionResponse.setMessage(e.getMessage());
+        commonApiExceptionResponse.setTimeStamp(System.currentTimeMillis());
+        return new ResponseEntity<CommonApiExceptionResponse>(commonApiExceptionResponse, HttpStatus.BAD_REQUEST);
+    }
 }

@@ -1,4 +1,4 @@
-package com.ecommerce.plantme.service;
+package com.ecommerce.plantme.implementation;
 
 import com.ecommerce.plantme.entity.Address;
 import com.ecommerce.plantme.entity.User;
@@ -7,6 +7,7 @@ import com.ecommerce.plantme.exceptions.ResourceNotFoundException;
 import com.ecommerce.plantme.payloads.AddressDTO;
 import com.ecommerce.plantme.repository.AddressRepo;
 import com.ecommerce.plantme.repository.UserRepo;
+import com.ecommerce.plantme.service.AddressService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,7 +60,7 @@ public class AddressServiceImpl implements AddressService {
                 country, state, city, pincode, streetArea, houseBuilding
         );
 
-        if (addressDB != null){
+        if (addressDB != null) {
             Long addressIdFromDb = addressDB.getAddressId();
             if (addressRepo.findAddressByUserId(addressIdFromDb, userId) !=null ){
                 throw new CommonApiException("Address already exists for UserId : "+ userId);
@@ -91,7 +92,7 @@ public class AddressServiceImpl implements AddressService {
         User user = userRepo.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User", "userId", userId));
 
         List<Address> addresses = addressRepo.findAllAddressesByUserId(userId);
-        if (addresses == null) {
+        if (addresses.isEmpty()) {
             throw new ResourceNotFoundException("Addresses", "userId", userId);
         }
         List<AddressDTO> addressDTOS = new ArrayList<>();
