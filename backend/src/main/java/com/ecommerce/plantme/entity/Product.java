@@ -1,21 +1,23 @@
 package com.ecommerce.plantme.entity;
 
+
 import com.ecommerce.plantme.entity.enums.Category;
 import com.ecommerce.plantme.entity.enums.CommonStatus;
 import com.ecommerce.plantme.entity.enums.ProductTag;
 import jakarta.persistence.*;
 import lombok.*;
 
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+
 @Table(name = "Product")
 @Inheritance(strategy = InheritanceType.JOINED)
+
 public class Product {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "product_id")
     private Long productId;
 
@@ -50,3 +52,4 @@ public class Product {
     private CommonStatus productStatus;
 
 }
+
