@@ -2,7 +2,6 @@ package com.ecommerce.plantme.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.ArrayList;
 import java.util.List;
 

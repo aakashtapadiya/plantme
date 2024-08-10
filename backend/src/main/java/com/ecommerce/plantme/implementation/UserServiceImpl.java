@@ -1,16 +1,16 @@
-package com.ecommerce.plantme.service;
+package com.ecommerce.plantme.implementation;
 
 import com.ecommerce.plantme.entity.User;
 import com.ecommerce.plantme.exceptions.CommonApiException;
+import com.ecommerce.plantme.exceptions.ResourceAlreadyFoundException;
 import com.ecommerce.plantme.exceptions.ResourceNotFoundException;
 import com.ecommerce.plantme.payloads.UserDTO;
 import com.ecommerce.plantme.repository.UserRepo;
+import com.ecommerce.plantme.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -18,6 +18,8 @@ public class UserServiceImpl implements UserService {
     private UserRepo userRepo;
 
     private ModelMapper modelMapper;
+
+
 
     @Autowired
     public UserServiceImpl (
@@ -39,10 +41,10 @@ public class UserServiceImpl implements UserService {
     public UserDTO registerUser (UserDTO userDTO)  {
 
         if (userRepo.findByEmail(userDTO.getEmail()) != null) {
-            throw new CommonApiException("Email Id Already exists : " + userDTO.getEmail());
+            throw new ResourceAlreadyFoundException("Email Id","email id",userDTO.getEmail());
         }
         if (userRepo.findByMobileNumber(userDTO.getMobileNumber()) != null) {
-            throw new CommonApiException("Mobile Number Already exists : " + userDTO.getMobileNumber());
+            throw new ResourceAlreadyFoundException("Mobile Number", "mobile number",userDTO.getMobileNumber());
         }
         User user = this.dtoToUser(userDTO);
         User savedUser = userRepo.save(user);

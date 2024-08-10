@@ -16,8 +16,6 @@ public class AuthController {
 
     private UserService userService;
 
-//    private PasswordEncoder passwordEncoder;
-
     @Autowired
     public AuthController(UserService userService) {
         this.userService = userService;
@@ -25,9 +23,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<UserDTO> registerHandler ( @RequestBody UserDTO theUserDTO) {
-
         UserDTO userDTO = userService.registerUser(theUserDTO);
-
         return new ResponseEntity<UserDTO>(userDTO, HttpStatus.CREATED);
     }
 
