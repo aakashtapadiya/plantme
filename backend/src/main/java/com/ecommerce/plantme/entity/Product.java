@@ -17,7 +17,8 @@ import lombok.*;
 @Inheritance(strategy = InheritanceType.JOINED)
 
 public class Product {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id")
     private Long productId;
 
