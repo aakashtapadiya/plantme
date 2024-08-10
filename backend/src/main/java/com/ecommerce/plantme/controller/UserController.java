@@ -32,8 +32,7 @@ public class UserController {
 
     @PostMapping("/cart/addCart/{userId}/{productId}")
     public ResponseEntity<CartDTO> addToCart(@PathVariable Long productId, @PathVariable Long userId){
-        //check if user is logged in.
-        // if quantity is in stock(if stock is zero change the button and disable from frontend
+//TOdo:check if user is logged in.if quantity is in stock(if stock is zero change the button and disable from frontend)
         CartDTO cartDTO= cartService.addToCart(productId,userId);
         return new ResponseEntity<CartDTO>(cartDTO, HttpStatus.CREATED);
     }
