@@ -34,6 +34,12 @@ public class ProductController {
         return new ResponseEntity<>(savedProductDTOList, HttpStatus.FOUND);
     }
 
+    @GetMapping("/product/{category}/{productId}")
+    public ResponseEntity<CategoryProductDTO> getProductById (@PathVariable Category category, @PathVariable Long productId) {
+        CategoryProductDTO categoryProductDTO = productService.getProductById(category, productId);
+        return new ResponseEntity<>(categoryProductDTO, HttpStatus.FOUND);
+    }
+
     @PutMapping("/product/{productId}")
     public ResponseEntity<CategoryProductDTO> updateProductDTO (@RequestBody CategoryProductDTO categoryProductDTO, @PathVariable Long productId){
         CategoryProductDTO updatedCategoryProductDTO = productService.updateProduct(categoryProductDTO, productId);
@@ -46,5 +52,9 @@ public class ProductController {
         return new ResponseEntity<>(savedProductDTO, HttpStatus.OK);
     }
 
+    @DeleteMapping("/product/{productId}")
+    public ResponseEntity<String> deleteProduct (@PathVariable Long productId) {
+        return new ResponseEntity<>("msg", HttpStatus.OK);
+    }
 
 }
