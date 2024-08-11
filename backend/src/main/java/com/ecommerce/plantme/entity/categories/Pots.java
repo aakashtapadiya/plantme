@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "pots")
+@Table(name = "product_pots")
 public class Pots extends Product {
 
     @Column(name = "pot_type")
