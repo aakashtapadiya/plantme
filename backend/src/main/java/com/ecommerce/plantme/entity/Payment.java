@@ -1,7 +1,9 @@
 package com.ecommerce.plantme.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -9,25 +11,26 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Payments")
+@Table(name = "payments")
 public class Payment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_id")
     private Long paymentId;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @Column(name = "amount")
-    private Double amount;
+    @Column(name = "payment_status", nullable = false)
+    private String paymentStatus;  //it could be enum but for future case for ex :in process,success,failure,etc
 
-    @Column(name = "payment_status")
-    private String paymentStatus; // e.g., "SUCCESS", "FAILED"
-
-    @Column(name = "payment_date")
+    @Column(name = "payment_date", nullable = false)
     private LocalDateTime paymentDate;
 
-    @Column(name = "payment_method")
-    private String paymentMethod; // e.g., "CREDIT_CARD", "PAYPAL"
+    @Column(name = "amount", nullable = false)
+    private Double amount;
+
 }
+

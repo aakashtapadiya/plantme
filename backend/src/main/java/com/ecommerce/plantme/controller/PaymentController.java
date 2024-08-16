@@ -3,11 +3,14 @@ import com.ecommerce.plantme.payloads.PaymentDTO;
 import com.ecommerce.plantme.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/payments")
+@RequestMapping("/api/payment")
 public class PaymentController {
 
     private final PaymentService paymentService;
@@ -17,14 +20,22 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    @PostMapping("/process")
+    @PostMapping(value = "/process/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PaymentDTO> processPayment(
-            @RequestParam Long userId,
-            @RequestParam Double amount,
-            @RequestParam String paymentMethod
+            @PathVariable Long userId
+
     ) {
-        PaymentDTO paymentDTO = paymentService.processPayment(userId, amount, paymentMethod);
-        return new ResponseEntity<>(paymentDTO, HttpStatus.OK);
+        String paymentMethod;
+        PaymentDTO paymentDTO = paymentService.processPayment(userId, paymentMethod="upi");
+        System.out.println(paymentDTO);
+        return new ResponseEntity<>(paymentDTO, HttpStatus.CREATED);
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<PaymentDTO>> getPaymentsByUserId(@PathVariable Long userId) {
+        List<PaymentDTO> payments = paymentService.getPaymentsByUserId(userId);
+        return ResponseEntity.ok(payments);
+    }
+
 }
 

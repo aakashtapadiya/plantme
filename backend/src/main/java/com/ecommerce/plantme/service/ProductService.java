@@ -17,4 +17,5 @@ public interface ProductService {
 
     ProductDTO updateStockQuantity (Integer stockQuantity, Long productId);
 
+    String deleteProduct(Long productId);
 }
