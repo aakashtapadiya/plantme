@@ -1,7 +1,7 @@
 package com.ecommerce.plantme.implementation;
 
 import com.ecommerce.plantme.entity.*;
-import com.ecommerce.plantme.entity.Cart;
+import com.ecommerce.plantme.entity.CartItem;
 import com.ecommerce.plantme.exceptions.ResourceNotFoundException;
 import com.ecommerce.plantme.payloads.CartDTO;
 import com.ecommerce.plantme.repository.CartRepo;
@@ -11,7 +11,6 @@ import com.ecommerce.plantme.service.CartService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,7 @@ import java.util.List;
 @Service
 public class CartServiceImpl implements CartService {
 
-    private final CartRepo cartRepo;
+    private final CartRepo cartItemRepo;
     private final ProductRepo productRepo;
     private final UserRepo userRepo;
     private final ModelMapper modelMapper;
@@ -27,12 +26,12 @@ public class CartServiceImpl implements CartService {
 
     @Autowired
     public CartServiceImpl (
-            CartRepo cartRepo,
+            CartRepo cartItemRepo,
             ProductRepo productRepo,
             UserRepo userRepo,
             ModelMapper modelMapper
     ) {
-        this.cartRepo = cartRepo;
+        this.cartItemRepo = cartItemRepo;
         this.productRepo=productRepo;
         this.userRepo = userRepo;
         this.modelMapper = modelMapper;
@@ -40,107 +39,82 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartDTO addToCart(Long productId, Long userId) {
-        User user = userRepo.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User", "userId", userId));
-        Product product = productRepo.findById(productId).orElseThrow(()-> new ResourceNotFoundException("Product", "productId", productId));
-        Cart cartItem=cartRepo.findByUserIdAndProductId(user,product);
-        Cart cart=null;
-        //If product already exists change quantity else add new item in cart.
-        if (ObjectUtils.isEmpty(cartItem)){
-            cart=new Cart();
-            cart.setUser(user);
-            cart.setProduct(product);
-            cart.setQuantity(1);
-            cart.setPrice(1*product.getPrice());
+        CartItem cartItem=cartItemRepo.findByUserIdAndProductId(userId,productId);
+        Product product=productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product", "productId",productId));
+        //If product already exists change quantity else add new item in cartItem.
+        if (cartItem==null){
+            cartItem=new CartItem();
+            cartItem.setUserId(userId);
+            cartItem.setProductId(productId);
+            cartItem.setQuantity(1);
+            cartItem.setPrice(1*product.getPrice());
         }
         else{
-            cart=cartItem;
-            cart.setQuantity(cartItem.getQuantity()+1);
-            cart.setPrice(cart.getQuantity()*product.getPrice());
+            cartItem=cartItem;
+            cartItem.setQuantity(cartItem.getQuantity()+1);
+            cartItem.setPrice(cartItem.getQuantity()*product.getPrice());
         }
-        cartRepo.save(cart);
-        return this.cartToDto(cart);
+        cartItemRepo.save(cartItem);
+        return this.cartItemToDto(cartItem);
     }
-    @Override
-    public List<Double> getCartCountAndPrice(Long userId) {
-        List<Double> countAndPrice = new ArrayList<>();
 
-        // Fetching the count of items in the cart for the given userId
-        Double count = Double.valueOf(cartRepo.countByUser_UserId(userId));
-
-        // Fetching the cart items directly using the userId
-        List<Cart> carts = cartRepo.findByUser_UserId(userId);
-
-        Double totalPrice = 0.0;
-
-        // Calculate the total price of the items in the cart
-        for (Cart c : carts) {
-            Product p = productRepo.findById(c.getProduct().getProductId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", c.getProduct().getProductId()));
-            totalPrice += (p.getPrice() * c.getQuantity());
-        }
-
-        countAndPrice.add(count);
-        countAndPrice.add(totalPrice);
-
-        // Return list containing the total count and price for UI and payment purposes.
-        return countAndPrice;
-    }
 
     @Override
     public List<CartDTO> findCartByUserId(Long userId) {
-        // Directly fetching the cart items for the given userId
-        List<Cart> carts = cartRepo.findByUser_UserId(userId);
-        List<CartDTO> cartDTOS = new ArrayList<>();
+        // Directly fetching the cartItem items for the given userId
+        List<CartItem> cartItems = cartItemRepo.findByUserId(userId);
+        List<CartDTO> cartItemDTOS = new ArrayList<>();
 
-        // Mapping Cart entities to CartDTOs and calculating price
-        for (Cart c : carts) {
-            Product p = productRepo.findById(c.getProduct().getProductId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", c.getProduct().getProductId()));
-            c.setPrice(p.getPrice() * c.getQuantity());
-            cartDTOS.add(this.cartToDto(c));
+        // Mapping cartItem entities to cartItemDTOs and calculating price
+        for (CartItem c : cartItems) {
+            cartItemDTOS.add(this.cartItemToDto(c));
         }
 
-        return cartDTOS;
+        return cartItemDTOS;
     }
 
     @Override
     public CartDTO updateQuantity(long userId, long productId, int quantity) {
-        User user = userRepo.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User", "userId", userId));
-        Product product = productRepo.findById(productId).orElseThrow(()-> new ResourceNotFoundException("Product", "productId", productId));
-        Cart c = cartRepo.findByUserIdAndProductId(user, product);
+        CartItem c = cartItemRepo.findByUserIdAndProductId(userId, productId);
         if (c == null) {
-            throw new ResourceNotFoundException("Cart", "cartId", String.valueOf(c));
+            throw new ResourceNotFoundException("cartItem", "cartItemId", String.valueOf(c));
         }
         if (quantity == 0) {
-            cartRepo.deleteById(c.getCartId());
+            cartItemRepo.deleteById(c.getCartId());
             return null;
         } else {
-            Product p=productRepo.findById(c.getProduct().getProductId()).orElseThrow(()-> new ResourceNotFoundException("Product", "productId", c.getProduct().getProductId()));
+            Product p=productRepo.findById(productId).orElseThrow(()-> new ResourceNotFoundException("Product", "productId", productId));
             c.setQuantity(quantity);
             c.setPrice(quantity*p.getPrice());
-            cartRepo.save(c); // Save the updated cart
+            cartItemRepo.save(c); // Save the updated cartItem
         }
 
-        return cartToDto(c);
+        return cartItemToDto(c);
+    }
+
+    @Override
+    public String deletecartItemForUser(Long cartItemId) {
+        CartItem cartItem = cartItemRepo.findById(cartItemId).orElseThrow(()-> new ResourceNotFoundException("cartItem", "cartItemId", cartItemId));
+        cartItemRepo.deleteById(cartItemId);
+        return "Cart item Deleted Successfully";
     }
 
     /**
-     * MAPPING CartDTO to Cart
-     * @param cartDTO
-     * @return Cart
+     * MAPPING cartItemDTO to cartItem
+     * @param cartItemDTO
+     * @return cartItem
      */
-    private Cart dtoToCart (CartDTO cartDTO) {
-        Cart cart = this.modelMapper.map(cartDTO, Cart.class);
-        return cart;
+    private CartItem dtoTocartItem (CartDTO cartItemDTO) {
+        CartItem cartItem = this.modelMapper.map(cartItemDTO, CartItem.class);
+        return cartItem;
     }
 
     /**
-     * MAPPING Cart TO CartDTO
-     * @param cart
-     * @return CartDTO
+     * MAPPING cartItem TO cartItemDTO
+     * @param cartItem
+     * @return cartItemDTO
      */
-    private CartDTO cartToDto (Cart cart) {
-        CartDTO cartDTO = this.modelMapper.map(cart, CartDTO.class);
-        return cartDTO;
+    private CartDTO cartItemToDto (CartItem cartItem) {
+        return this.modelMapper.map(cartItem, CartDTO.class);
     }
 }

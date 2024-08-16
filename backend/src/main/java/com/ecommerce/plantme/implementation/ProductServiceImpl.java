@@ -131,6 +131,12 @@ public class ProductServiceImpl implements ProductService {
         return this.ProductToDto(product);
     }
 
+    @Override
+    public String deleteProduct(Long productId) {
+        Product product = productRepo.findById(productId).orElseThrow(()->new ResourceNotFoundException("Product","productId",productId));
+        productRepo.deleteById(productId);
+        return "Deleted";
+    }
 
 
     /**

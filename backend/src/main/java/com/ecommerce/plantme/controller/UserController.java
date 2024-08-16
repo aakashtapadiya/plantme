@@ -15,13 +15,12 @@ import java.util.List;
 @RequestMapping("/api")
 public class UserController {
 
-    private UserService userService;
-    private CartService cartService;
+    private final UserService userService;
 
     @Autowired
-    public UserController (UserService userService,CartService cartService) {
+    public UserController (UserService userService) {
         this.userService = userService;
-        this.cartService=cartService;
+
     }
 
     @GetMapping("/users/{userId}")
@@ -29,28 +28,4 @@ public class UserController {
         UserDTO userDTO = userService.getUserbyId(userId);
         return new ResponseEntity<UserDTO>(userDTO, HttpStatus.CREATED);
     }
-
-    @PostMapping("/cart/addCart/{userId}/{productId}")
-    public ResponseEntity<CartDTO> addToCart(@PathVariable Long productId, @PathVariable Long userId){
-//TOdo:check if user is logged in.if quantity is in stock(if stock is zero change the button and disable from frontend)
-        CartDTO cartDTO= cartService.addToCart(productId,userId);
-        return new ResponseEntity<CartDTO>(cartDTO, HttpStatus.CREATED);
-    }
-
-    @GetMapping("/cart/loadCart/{userId}")
-    public ResponseEntity<List<CartDTO>> LoadCartPage(@PathVariable Long userId){
-        List<CartDTO> cartDTOS=cartService.findCartByUserId(userId);
-        return new ResponseEntity<>(cartDTOS, HttpStatus.FOUND);
-    }
-    @GetMapping("/cart/getCountAndPrice/{userId}")
-    public ResponseEntity<List<Double>> getCountAndPrice(@PathVariable Long userId){
-        List<Double> countAndPrice=cartService.getCartCountAndPrice(userId);
-        return new ResponseEntity<>(countAndPrice, HttpStatus.FOUND);
-    }
-    @PutMapping("/cart/updatecart/{userId}/{productId}/{quantity}")
-    public  ResponseEntity<CartDTO> updateQuantity(@PathVariable long userId, @PathVariable long productId, @PathVariable int quantity){
-        CartDTO cartDTO=cartService.updateQuantity(userId,productId,quantity);
-        return new ResponseEntity<>(cartDTO,HttpStatus.OK);
-    }
-
 }

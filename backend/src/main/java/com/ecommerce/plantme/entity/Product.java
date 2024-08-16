@@ -1,12 +1,11 @@
 package com.ecommerce.plantme.entity;
-
-
 import com.ecommerce.plantme.entity.enums.Category;
 import com.ecommerce.plantme.entity.enums.CommonStatus;
 import com.ecommerce.plantme.entity.enums.ProductTag;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -51,6 +50,9 @@ public class Product {
     @Enumerated(EnumType.STRING)
     @Column(name = "product_status")
     private CommonStatus productStatus;
+
+    @OneToMany(mappedBy = "productId", cascade = CascadeType.ALL)
+    private List<CartItem> cartItems;
 
 }
 
